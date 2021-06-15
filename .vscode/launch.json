@@ -11,8 +11,8 @@
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "program": "${workspaceFolder}\\index.js",
-            "args": ["en", "C:\\Users\\a-krasnov\\Desktop\\translate\\content\\Localizable.strings"]
+            "program": "${workspaceFolder}/index.js",
+            "args": ["en,fr,es,de", "/Users/a-krasnov/Desktop/dev/hype-email/hype-email"]
         }
     ]
 }

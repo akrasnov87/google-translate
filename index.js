@@ -3,62 +3,76 @@
 /*
 https://github.com/justinklemm/i18n-strings-files
 */
-const pth = require('path')
+const pth = require('path');
+const join = pth.join;
 
-process.env.GOOGLE_APPLICATION_CREDENTIALS = pth.join(__dirname, 'mobile-walker-72293ee4ca27.json');
+process.env.GOOGLE_APPLICATION_CREDENTIALS = join(__dirname, 'mobile-walker-72293ee4ca27.json');
 var args = process.argv.slice(2);
-const fs  =require('fs')
-const {Translate} = require('@google-cloud/translate').v2;
-const translate = new Translate();
+const fs = require('fs')
+const tr = require('./modules/translate');
 
-const language = args[0]
-const filePath = args[1]
+// список языков для обработки. По умолчанию ru
+const languages = args[0].split(',');
+// директория для вывода результата
+const dir = args[1]
+// папка для хранения локализации по умолчанию
+const defaultLangFolder = join(dir, 'ru.lproj');
 
-var output = [];
+nextLproj(languages, () => {
+    nextSettings(languages, () => {
+        console.log("Обработка завершена");
+    });
+});
 
-if (fs.existsSync(filePath)) {
+function nextLproj(list, callback) {
+    const lang = list[0];
 
-    var content = fs.readFileSync(filePath).toString();
-    var lines = content.split('\n');
+    if(lang != undefined) {
+        list.shift();
 
-    function next() {
-        var line = lines[0];
-        if (line != undefined) {
-            lines.shift();
+        const langFolder = join(dir, lang + '.lproj');
 
-            if(line == '' || line.startsWith('/*')) {
-                output.push(line);
-                next();
-            } else {
-                var array = /\"([\s|\S]*)\"\s*=\s*\"([\s|\S]*)\"/gi.exec(line);
-                if(array.length == 3) {
-                    const key = array[1];
-                    const value = array[2];
+        const InfoPlistSource = join(defaultLangFolder, 'InfoPlist.strings');
+        const LaunchScreenSource = join(defaultLangFolder, 'LaunchScreen.strings');
+        const LocalizableSource = join(defaultLangFolder, 'Localizable.strings');
+        const MainSource = join(defaultLangFolder, 'Main.strings');
 
-                    translate.translate(value, language).then((translations) => {
-                        output.push('"' + key + '" = "' + translations[0] + '";')
-                        next();
+        const InfoPlistTarget = join(langFolder, 'InfoPlist.strings');
+        const LaunchScreenTarget = join(langFolder, 'LaunchScreen.strings');
+        const LocalizableTarget = join(langFolder, 'Localizable.strings');
+        const MainTarget = join(langFolder, 'Main.strings');
+
+        tr(InfoPlistSource, InfoPlistTarget, lang, () => {
+            tr(LaunchScreenSource, LaunchScreenTarget, lang, () => {
+                tr(LocalizableSource, LocalizableTarget, lang, () => {
+                    tr(MainSource, MainTarget, lang, () => {
+                        nextLproj(languages, callback);
                     });
-                } else {
-                    output.push(line);
-                    console.error("ERROR: Ошибка при распозновании строки");
-                    next();
-                }
-            }
-        } else {
-            finish();
-        }
+                });
+            });
+        });
+    } else {
+        callback();
     }
-    
-    next();
 }
 
-function finish() {
-    var dir = pth.join(__dirname, 'content', language);
-    if(!fs.existsSync(dir)) {
-        fs.mkdirSync(dir);
-    }
+function nextSettings(list, callback) {
+    const lang = list[0];
 
-    var file = pth.join(dir, pth.basename(filePath));
-    fs.writeFileSync(file, output.join('\n'));
+    if(lang != undefined) {
+        list.shift();
+
+        const langFolder = join(dir, 'asserts', 'Settings.bundle', lang + '.lproj');
+        const defaultLangFolder = join(dir, 'asserts', 'Settings.bundle', 'ru.lproj');
+
+        const RootSource = join(defaultLangFolder, 'Root.strings');
+
+        const RootTarget = join(langFolder, 'Root.strings');
+
+        tr(RootSource, RootTarget, lang, () => {
+            nextSettings(languages, callback);
+        });
+    } else {
+        callback();
+    }
 }
