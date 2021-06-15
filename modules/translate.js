@@ -24,6 +24,11 @@ module.exports = function(fromFile, toFile, targetLang, callback) {
             var line = lines[0];
             if (line != undefined) {
                 lines.shift();
+
+                if (line.startsWith('/*') && line.endsWith('*/')) {
+                    output.push(line);
+                    return next();
+                }
     
                 if (comment == true && line.endsWith('*/')) {
                     comment = false;

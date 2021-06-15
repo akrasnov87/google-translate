@@ -12,13 +12,14 @@ const fs = require('fs')
 const tr = require('./modules/translate');
 
 // список языков для обработки. По умолчанию ru
-const languages = args[0].split(',');
+var languages = args[0].split(',');
 // директория для вывода результата
 const dir = args[1]
 // папка для хранения локализации по умолчанию
 const defaultLangFolder = join(dir, 'ru.lproj');
 
 nextLproj(languages, () => {
+    languages = args[0].split(',');
     nextSettings(languages, () => {
         console.log("Обработка завершена");
     });
@@ -46,7 +47,7 @@ function nextLproj(list, callback) {
             tr(LaunchScreenSource, LaunchScreenTarget, lang, () => {
                 tr(LocalizableSource, LocalizableTarget, lang, () => {
                     tr(MainSource, MainTarget, lang, () => {
-                        nextLproj(languages, callback);
+                        nextLproj(list, callback);
                     });
                 });
             });
@@ -58,6 +59,7 @@ function nextLproj(list, callback) {
 
 function nextSettings(list, callback) {
     const lang = list[0];
+    console.log(JSON.stringify(list))
 
     if(lang != undefined) {
         list.shift();
@@ -70,7 +72,7 @@ function nextSettings(list, callback) {
         const RootTarget = join(langFolder, 'Root.strings');
 
         tr(RootSource, RootTarget, lang, () => {
-            nextSettings(languages, callback);
+            nextSettings(list, callback);
         });
     } else {
         callback();
