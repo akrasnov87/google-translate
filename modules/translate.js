@@ -57,7 +57,7 @@ module.exports = function(fromFile, toFile, targetLang, callback) {
                         const value = array[2];
     
                         translate.translate(value, targetLang).then((translations) => {
-                            output.push('"' + key + '" = "' + translations[0] + '";')
+                            output.push('"' + key + '" = "' + translations[0].replace(/% @/gi, '%@').replace(/ %@/gi, '%@').replace(/%@/gi, ' %@') + '";')
                             next();
                         });
                     } else {
