@@ -34,14 +34,18 @@ function nextLproj(list, callback) {
         const langFolder = join(dir, lang + '.lproj');
 
         const InfoPlistSource = join(defaultLangFolder, 'InfoPlist.strings');
+        const LocalizableSource = join(defaultLangFolder, 'Localizable.strings');
         const MainSource = join(defaultLangFolder, 'Main.strings');
 
         const InfoPlistTarget = join(langFolder, 'InfoPlist.strings');
+        const LocalizableTarget = join(langFolder, 'Localizable.strings');
         const MainTarget = join(langFolder, 'Main.strings');
 
         tr(InfoPlistSource, InfoPlistTarget, lang, () => {
             tr(MainSource, MainTarget, lang, () => {
-                nextLproj(list, callback);
+                tr(LocalizableSource, LocalizableTarget, lang, () => {
+                    nextLproj(list, callback);
+                });
             });
         });
     } else {
