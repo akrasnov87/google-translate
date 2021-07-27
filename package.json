@@ -1,14 +1,19 @@
 {
-  "name": "translate",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "google-translate",
+  "version": "1.42.565",
+  "birthday": "2021-06-15",
+  "description": "Переводчик для проектов на iOS (Mac и iPhone)",
+  "main": "index.mac.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "author": "Aleksandr Krasnov",
   "license": "ISC",
   "dependencies": {
     "@google-cloud/translate": "^6.2.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/akrasnov87/google-translate"
   }
 }

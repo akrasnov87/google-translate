@@ -11,8 +11,8 @@
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "program": "${workspaceFolder}/index.js",
-            "args": ["en,fr,es,de", "/Users/a-krasnov/Desktop/dev/hype-email/hype-email"]
+            "program": "${workspaceFolder}/index.mac.js",
+            "args": ["en,fr,es,de,it", "/Users/a-krasnov/Desktop/dev/arm/arm"]
         }
     ]
 }
