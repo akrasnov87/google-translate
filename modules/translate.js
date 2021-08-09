@@ -52,6 +52,9 @@ module.exports = function(fromFile, toFile, targetLang, callback) {
                     next();
                 } else {
                     var array = /\"([\s|\S]*)\"\s*=\s*\"([\s|\S]*)\"/gi.exec(line);
+                    if (array == undefined) {
+                        return next();
+                    }
                     if(array.length == 3) {
                         const key = array[1];
                         const value = array[2];
@@ -78,5 +81,7 @@ module.exports = function(fromFile, toFile, targetLang, callback) {
         }
         
         next();
-    }    
+    } else {
+        callback();
+    }
 }
