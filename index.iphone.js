@@ -17,6 +17,8 @@ var languages = args[0].split(',');
 const dir = args[1]
 // папка для хранения локализации по умолчанию
 const defaultLangFolder = join(dir, 'ru.lproj');
+// данные для игнорирования
+const ignore = join(dir, '../', 'translate.ignore');
 
 nextLproj(languages, () => {
     languages = args[0].split(',');
@@ -43,10 +45,10 @@ function nextLproj(list, callback) {
         const LocalizableTarget = join(langFolder, 'Localizable.strings');
         const MainTarget = join(langFolder, 'Main.strings');
 
-        tr(InfoPlistSource, InfoPlistTarget, lang, () => {
-            tr(LaunchScreenSource, LaunchScreenTarget, lang, () => {
-                tr(LocalizableSource, LocalizableTarget, lang, () => {
-                    tr(MainSource, MainTarget, lang, () => {
+        tr(ignore, InfoPlistSource, InfoPlistTarget, lang, () => {
+            tr(ignore, LaunchScreenSource, LaunchScreenTarget, lang, () => {
+                tr(ignore, LocalizableSource, LocalizableTarget, lang, () => {
+                    tr(ignore, MainSource, MainTarget, lang, () => {
                         nextLproj(list, callback);
                     });
                 });
@@ -71,7 +73,7 @@ function nextSettings(list, callback) {
 
         const RootTarget = join(langFolder, 'Root.strings');
 
-        tr(RootSource, RootTarget, lang, () => {
+        tr(ignore, RootSource, RootTarget, lang, () => {
             nextSettings(list, callback);
         });
     } else {

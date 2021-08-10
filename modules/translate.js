@@ -11,9 +11,11 @@ const fs = require('fs')
 const {Translate} = require('@google-cloud/translate').v2;
 const translate = new Translate();
 
-module.exports = function(fromFile, toFile, targetLang, callback) {
+module.exports = function(ignoreFile, fromFile, toFile, targetLang, callback) {
     var output = [];
     var comment = false;
+
+    var ignore = readIgnore(ignoreFile);
 
     if (fs.existsSync(fromFile)) {
     
@@ -58,6 +60,11 @@ module.exports = function(fromFile, toFile, targetLang, callback) {
                     if(array.length == 3) {
                         const key = array[1];
                         const value = array[2];
+
+                        if (ignore[targetLang] && ignore[targetLang][key] != undefined) {
+                            output.push('"' + key + '" = "' + ignore[targetLang][key] + '";')
+                            return next();
+                        }
     
                         translate.translate(value, targetLang).then((translations) => {
                             output.push('"' + key + '" = "' + translations[0].replace(/% @/gi, '%@').replace(/ %@/gi, '%@').replace(/%@/gi, ' %@') + '";')
@@ -84,4 +91,27 @@ module.exports = function(fromFile, toFile, targetLang, callback) {
     } else {
         callback();
     }
+}
+
+function readIgnore(file) {
+    if (fs.existsSync(file)) {
+        var result = {};
+        var str = fs.readFileSync(file).toString();
+        var data = str.split('\n');
+        for (var i in data) {
+            var item = data[i];
+            var array = item.split(' = ');
+            if (array.length == 3) {
+                if (result[array[0]] == undefined) {
+                    result[array[0]] = {};
+                }
+
+                result[array[0]][array[1]] = array[2];
+            }
+        }
+
+        return result;
+    }
+
+    return {};
 }
